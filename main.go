@@ -5,9 +5,13 @@ import (
 
 	"github.com/aseytekow/user-api-go/actions"
 	"github.com/aseytekow/user-api-go/db"
-	"github.com/aseytekow/user-api-go/models"
+
+	// "github.com/aseytekow/user-api-go/db"
+
+	// "github.com/aseytekow/user-api-go/models"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,8 +26,13 @@ func main() {
 
 	server := gin.Default()
 
-	db := db.ConnectDB()
-	db.AutoMigrate(&models.User{})
+	db := db.DBConn()
+
+	res := db.QueryRow("CREATE TABLE IF NOT EXISTS ACCOUNT(ID SERIAL PRIMARY KEY, NAME VARCHAR(50), EMAIL VARCHAR(50), PASSWORD VARCHAR(64))")
+
+	if res.Err() != nil {
+		logrus.Fatal("Failed to create ACCOUNT table!")
+	}
 
 	server.POST("/api/accounts", actions.CreateUser)
 	server.GET("/api/accounts", actions.ListAllUsers)

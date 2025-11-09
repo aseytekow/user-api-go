@@ -1,20 +1,18 @@
 package db
 
 import (
+	"database/sql"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-func ConnectDB() *gorm.DB {
-	url := os.Getenv("DB_URL")
-	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+func DBConn() *sql.DB {
+	db, err := sql.Open("postgres", os.Getenv("DB_URL"))
 
 	if err != nil {
-		logrus.Fatal("Failed to connect DB!\n\nError: ", err)
+		logrus.Fatalf("Failed! %v", err)
 	}
-
 	return db
 }
